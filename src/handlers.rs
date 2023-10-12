@@ -105,3 +105,27 @@ pub async fn update_quote(
         Err(_) => StatusCode::INTERNAL_SERVER_ERROR,
     }
 }
+
+pub async fn delete_quote(
+    State(pool): State<PgPool>,
+    Path(id): Path<uuid::Uuid>,
+) -> StatusCode {
+    let res = sqlx::query(
+        r#"
+        DELETE FROM quotes
+        WHERE id = $1
+        "#,
+    )
+    .bind(id)
+    .execute(&pool)
+    .await
+    .map(|res| match res.rows_affected() {
+        0 => StatusCode::NOT_FOUND,
+        _ => StatusCode::OK,
+    });
+
+    match res {
+        Ok(status) => status,
+        Err(_) => StatusCode::INTERNAL_SERVER_ERROR,
+    }
+}
