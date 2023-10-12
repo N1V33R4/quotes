@@ -1,7 +1,7 @@
 mod handlers;
 use std::env;
 
-use axum::routing::{get, Router, post};
+use axum::routing::{get, Router, post, put};
 use sqlx::postgres::PgPoolOptions;
 
 #[tokio::main]
@@ -21,6 +21,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .route("/health", get(handlers::health))
         .route("/quotes", post(handlers::create_quote))
         .route("/quotes", get(handlers::read_quotes))
+        .route("/quotes/:id", put(handlers::update_quote))
         .with_state(pool);
 
     axum::Server::bind(&addr.parse().unwrap())
